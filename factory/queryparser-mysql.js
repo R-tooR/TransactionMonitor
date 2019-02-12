@@ -8,6 +8,9 @@ class QueryParserMySQL {
             updateSet : " SET ",
             updateWhere : " WHERE ",
 
+            deleteBegin : "DELETE FROM ",
+            deleteWhere : " WHERE "
+
         }
     }
 
@@ -37,13 +40,52 @@ class QueryParserMySQL {
                     queryString += (key + "='" + query["values"][key] + "',");
 
                 queryString = queryString.slice(0, queryString.length - 1);
-                queryString += this.syntax.updateWhere + query[0] + "=" + query["values"][query[0]] + ";";
+                queryString += this.syntax.updateWhere + query["idcolumn"] + "=" + query["values"][query["idcolumn"]] + ";";
             }
+
 
 
             return queryString;
         }
+    }
 
+    parseIntoInsertQuery(queryObj){
+        let queryString = "";
+        queryString = this.syntax.insertBegin + queryObj["table"] + this.syntax.insertVal;
+
+        for(let key in query["values"])
+            queryString += queryObj["values"][key] + "','";
+
+        queryString = queryString.slice(0, queryString.length - 2);
+        queryString += ");";
+
+        return queryString;
+    }
+
+    parseIntoUpdateQuery(queryObj){
+        let queryString = "";
+        queryString = this.syntax.updateBegin + queryObj["table"] + this.syntax.updateSet;
+
+        for(let key in queryObj["values"])
+            queryString += (key + "='" + queryObj["values"][key] + "',");
+
+        queryString = queryString.slice(0, queryString.length - 1);
+        queryString += this.syntax.updateWhere + queryObj["idcolumn"] + "=" + queryObj["values"][queryObj["idcolumn"]] + ";";
+
+        return queryString;
+    }
+
+    parseIntoDeleteQuery(queryObj){
+        let queryString = "";
+        queryString = this.syntax.deleteBegin + queryObj["table"] + this.syntax.deleteWhere;
+
+        for(let key in queryObj["values"])
+            queryString += (key + "='" + queryObj["values"][key] + "' AND ");
+
+        queryString = queryString.slice(0, queryString.length - 5);
+        queryString += ";";
+
+        return queryString;
     }
 
     /**

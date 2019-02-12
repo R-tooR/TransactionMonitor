@@ -1,9 +1,8 @@
-const coordinator = require('./coordinator');
+const Coordinator = require('./coordinator');
 
 class Monitor{
     constructor(){
-        this.coordinator = coordinator;
-        this.mapper = {};
+        this.coordinator = Coordinator();
     }
 
     generateTID(){
@@ -11,23 +10,12 @@ class Monitor{
     }
 
     async executeTransaction(data){
-        await coordinator.executeTransaction(data, this.generateTID()).then(()=> {}, (err) => {throw err;})
-        //create object with data
-        //pass it to coordinator
-
+        await this.coordinator.executeTransaction(data, this.generateTID()).then(()=> {}, (err) => {throw err;})
     }
 
-    setMapper(entity){
-        this.mapper = entity;
-        //map field to column and database name?
-    }
-
-    mapToEntity(data){
-
-    }
 
     addDatabase(databaseId, connection, dbtype, entity){
-        coordinator.addDatabase(databaseId, connection, dbtype, entity);
+        this.coordinator.addDatabase(databaseId, connection, dbtype, entity);
     }
 }
 

@@ -1,5 +1,4 @@
 const Contributor = require('./Contributor');
-const Promise = require('promise');
 
 class Coordinator {
     constructor() {
@@ -41,24 +40,21 @@ class Coordinator {
 
         for (let key in data) {
             if (data.hasOwnProperty(key)) {
-                 handl[key].record(data[key], transactionId, false)
-                    .then(() => {console.log(key + " : RESTORING");handl[key].restoreData(data[key])}).catch((err) => {console.log("No restoring in unavailable DB "+ err)});
+                 handl[key].record(transactionId, data[key], false)
+                    .then(() => {console.log(key + " : RESTORING");handl[key].restoreData(data[key])}).catch((err) => {console.log("No restoring in unavailable database "+ err)});
             }
         }
     }
-    //pierwsza kolumna w entity jest automatycznie uznawana jako Klucz
-    addDatabase(databaseId, connection, dbtype, entity) {//databaseType
 
-            //let newContributor = Contributor('mysql');//wzorzec factory + dodaj entity
+    addDatabase(databaseId, connection, dbtype, entity) {
             let newContributor = Contributor(dbtype, entity);
-            newContributor.servicer.setConnection(connection);
-
+            newContributor.activeRecord.setConnection(connection);
             this.Contributors[databaseId] = newContributor;
-            for(let key in this.Contributors)
-                console.log(this.Contributors[key] + " "+ key);
     }
 
 
 }
 
-module.exports = new Coordinator();
+module.exports = function(){
+    return new Coordinator();
+};

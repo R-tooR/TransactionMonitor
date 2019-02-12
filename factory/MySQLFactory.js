@@ -1,8 +1,8 @@
-const mysql = require('./gateway-mysql');
+const mysql = require('./active-record-mysql');
 const mysqlParser = require('./queryparser-mysql');
 
 function MySQLFactory(){
-    this.createServicer = function(entity){
+    this.createActiveRecord = function(entity){
         return mysql(entity);
     };
 

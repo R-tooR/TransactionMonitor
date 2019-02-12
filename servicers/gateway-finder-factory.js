@@ -1,4 +1,4 @@
-const mysql = require('../factory/gateway-mysql');
+const mysql = require('../factory/active-record-mysql');
 
 function GatewayFinderFactory(){
     let servicer;

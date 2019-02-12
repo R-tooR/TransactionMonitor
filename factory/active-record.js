@@ -1,4 +1,4 @@
-function Gateway(){
+function ActiveRecord(){
 
     this.dataForDBPoolAreValid = obj => {
         if (obj !== undefined && obj["connectionLimit"] !== undefined && obj["user"] !== undefined && obj["password"] !== undefined
@@ -22,6 +22,14 @@ function Gateway(){
             else return true;
         })
     };//TODO test it!
+
+    this.areColumnsConsistent = (sentColumns) => {
+        for(let key in this.entity["values"]) {
+            if (sentColumns.hasOwnProperty("values") && !sentColumns["values"].hasOwnProperty(key))
+                throw "Columns must agree!"
+        }
+        return true;
+    }
 }
 
-module.exports = Gateway;
+module.exports = ActiveRecord;

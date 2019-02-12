@@ -3,7 +3,6 @@ var logger = require('./logger/logger');
 var express = require('express');
 var app = express();
 app.set('view engine', 'pug');
-const coordinator = require('./coordinator');
 const monitor = require('./monitor');
 const bodyParser = require("body-parser");
 
@@ -28,14 +27,14 @@ monitor.addDatabase("base1", {
         nazwisko: "",
         kwota: 0
     },
-    id_column : "id_klienta"
+    idcolumn : "id_klienta"
 });
 
 monitor.addDatabase("base2", {
     connectionLimit : 10,
     host: 'localhost',
     user: 'root',
-    password: '',
+    password: '$Epultura33',
     database: 'coffeeland',
     port: 3307
 
@@ -47,7 +46,7 @@ monitor.addDatabase("base2", {
         openDate: "",
         isClosed: ""
     },
-    id_column: "orderId"
+    idcolumn: "orderId"
 });
 
 /*monitor.addDatabase("base2", {
@@ -97,6 +96,18 @@ const objUpdate = {
     idcolumn : "id_klienta"
 };
 
+const objDelete = {
+    operation : "delete",
+    table : "bank1.klienci",
+    values : {
+        id_klienta : "5",
+        imie : "Michał",
+        nazwisko : "Anioł",
+        kwota : 350
+    },
+    idcolumn : "id_klienta"
+};
+
 
 
 app.get('/', function(req, res) {
@@ -112,8 +123,8 @@ app.get('/', function(req, res) {
             console.log("Problem");
     }*/
     //res.render('index', {title: "Transaction Monitor Client"});
-    monitor.executeTransaction({base1: objInsert, base2: objInsert3}).then(() => {console.log("Success")}, () => {console.log("Fail")});
-
+    //monitor.executeTransaction({base1: objInsert, base2: objInsert3}).then(() => {console.log("Success")}, () => {console.log("Fail")});
+    console.log(parser.parseIntoDeleteQuery(objDelete));
     res.end();
 });
 app.post('/execute', function (req, res) {

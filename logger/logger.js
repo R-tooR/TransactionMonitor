@@ -12,7 +12,7 @@ class Logger{
     recordSuccess(transactionId, dataPrev, dataCurr){
         if(dataCurr.hasOwnProperty("operation") && dataCurr["operation"] === "insert"){
             fs.appendFileSync(this.path, transactionId+"|insert|"+JSON.stringify(dataCurr["values"])+"|true\n");
-        } else{
+        } else if (dataCurr.hasOwnProperty("operation") && dataCurr["operation"] === "update"){
             fs.appendFileSync(this.path, transactionId+"|update|"+JSON.stringify(dataCurr["values"])+"|"
                 +JSON.stringify(dataPrev)+"|true\n");
         }
@@ -29,4 +29,6 @@ class Logger{
 
 }
 
-module.exports = new Logger();
+module.exports = function() {
+    return new Logger();
+};

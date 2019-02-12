@@ -1,0 +1,34 @@
+doctype html
+html(lang='en')
+    head
+        title Pug
+    body
+        block content
+            .main.container
+                .row
+                    .col-md-6.col-md-offset-3
+                        h1.display-4.m-b-2 Sign Up
+
+                        form(method='POST' action='/execute')
+                            div.form-group
+                                label(for='account_nr') Numer konta właściciela:
+                                input#account_nr.form-control(type='text', name='account_nr')
+                            div.form-group
+                                label(for='first_name') Imię:
+                                input#first_name.form-control(type='text', name='first_name')
+                            div.form-group
+                                label(for='last_name') Nazwisko:
+                                input#last_name.form-control(type='text', name='last_name')
+                            div.form-group
+                                label(for='account_recipient_nr') Numer konta adresata:
+                                input#account_recipient_nr.form-control(type='text', name='account_recipient_nr')
+                            div.form-group
+                                label(for='money') Kwota:
+                                input#money.form-control(type='number' name='money')
+                            div.form-group
+                                label(for='pw') Hasło:
+                                input#pw.form-control(type='password' name='password')
+                            div.form-group
+                                label(for='pw2') Potwierdź hasło:
+                                input#pw2.form-control(type='password' name='confirmPassword')
+                            button.btn.btn-primary(type='submit') Wykonaj przelew

@@ -54,7 +54,6 @@ class ActiveRecordMysql extends ActiveRecord {
                     this.copyOfResult = await conn.query(query);
                     const result = await conn.query(query);
                     console.log(result);
-
                 } finally {
                     this.connectionPool.releaseConnection(conn);
                 }
@@ -71,11 +70,9 @@ class ActiveRecordMysql extends ActiveRecord {
                 const query = this.queryParser.parseIntoDeleteQuery(queryObj);
                 const copy = this.queryParser.createQueryForCopy(queryObj);
                 try {
-
                     this.copyOfResult = await conn.query(copy);
                     const result = await conn.query(query);
                     console.log(result);
-
                 } finally {
                     this.connectionPool.releaseConnection(conn);
                 }

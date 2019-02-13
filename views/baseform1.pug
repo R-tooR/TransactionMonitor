@@ -1,0 +1,27 @@
+doctype html
+html(lang='en')
+    head
+        title DB Form
+    body
+        block content
+            .main.container
+                .row
+                    .col-md-6.col-md-offset-3
+                        h1.display-4.m-b-2 Add record
+
+                        form(method='POST' action='/')
+                            div.form-group
+                                label(for='id_klienta') Id klienta:
+                                input#id_klienta.form-control(type='number', name='id_klienta')
+                            div.form-group
+                                label(for='imie') Imię:
+                                input#imie.form-control(type='text', name='imie')
+                            div.form-group
+                                label(for='nazwisko') Nazwisko:
+                                input#nazwisko.form-control(type='text', name='nazwisko')
+                            div.form-group
+                                label(for='kwota') Kwota:
+                                input#kwota.form-control(type='number', name='kwota')
+                            button.btn.btn-primary(type='submit' name="insert1") Insert
+                            button.btn.btn-primary(type='submit' name="update1") Update
+                            button.btn.btn-primary(type='submit' name="delete1") Delete

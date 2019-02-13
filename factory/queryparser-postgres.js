@@ -28,15 +28,13 @@ class QueryParserPostgreSQL {
                 for(let key in query["values"])
                     if(key !== query["idcolumn"])
                         queryString += query["values"][key] + "','";
-                    else
-                    {
+                    else {
                         queryString = queryString.slice(0, queryString.length - 1);
                         queryString += query["values"][key] + ",'";
                     }
 
                 queryString = queryString.slice(0, queryString.length - 2);
                 queryString += ");";
-
 
             }
             else if(query["operation"] === "update"){
@@ -48,8 +46,6 @@ class QueryParserPostgreSQL {
                 queryString = queryString.slice(0, queryString.length - 1);
                 queryString += this.syntax.updateWhere + query["idcolumn"] + "=" + query["values"][query["idcolumn"]] + ";";
             }
-
-
 
             return queryString;
         }

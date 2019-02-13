@@ -31,7 +31,6 @@ class QueryParserMySQL {
                 queryString = queryString.slice(0, queryString.length - 2);
                 queryString += ");";
 
-
             }
             else if(query["operation"] === "update"){
                 queryString = this.syntax.updateBegin + query["table"] + this.syntax.updateSet;
@@ -43,8 +42,6 @@ class QueryParserMySQL {
                 queryString += this.syntax.updateWhere + query["idcolumn"] + "=" + query["values"][query["idcolumn"]] + ";";
             }
 
-
-
             return queryString;
         }
     }
@@ -53,7 +50,7 @@ class QueryParserMySQL {
         let queryString = "";
         queryString = this.syntax.insertBegin + queryObj["table"] + this.syntax.insertVal;
 
-        for(let key in query["values"])
+        for(let key in queryObj["values"])
             queryString += queryObj["values"][key] + "','";
 
         queryString = queryString.slice(0, queryString.length - 2);
@@ -114,8 +111,8 @@ class QueryParserMySQL {
 
                 return restoreQuery;
 
-            } else if (data["operation"] === "insert" && copy["insertId"]){
-                return "DELETE FROM "+ data["table"] + " WHERE "+data["idcolumn"]+"="+copy["insertId"]+";"; //taka jest informacja po zwróceniu informacji z INSERT
+            } else if (data["operation"] === "insert"){
+                return "DELETE FROM "+ data["table"] + " WHERE "+data["idcolumn"]+"="+copy["insertId"]+";";
 
             } else if (data["operation"] === "delete") {
                 let restoreQuery = "INSERT INTO "+data["table"]+" VALUES('";

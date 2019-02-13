@@ -3,8 +3,9 @@ html(lang='en')
     head
         title Pug
     body
-        button(onclick='addToDB(1)') Add to DB 1
-        button(onclick='addToDB(2)') Add to DB 2
-        button(onclick='addToDB(3)') Add to DB 3
-        //button(onclick='addToDB(1)') Add to DB 1
-        script(src='../testserver.js')
+        form(method='POST' action='/base1')
+            button.btn.btn-primary(type='submit' name="base1") Base1
+        form(method='POST' action='/base3')
+            button.btn.btn-primary(type='submit' name="base3") Base2
+        form(method='POST' action='/execute')
+            button.btn.btn-primary(type='submit' name="transaction") Execute Transaction

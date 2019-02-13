@@ -17,7 +17,6 @@ class ActiveRecordPostgresql extends ActiveRecord {
      * @param connection Connection data to database
      */
     setConnection(connection) {
-        console.log(JSON.stringify(connection));
         if (this.dataForDBPoolAreValid(connection)) {
             this.connectionPool = postgresql(connection);
         } else throw "Object or at least one of its fields: 'user', 'password', 'host', 'database' is undefined";

@@ -2,7 +2,7 @@ const mysqlfactory = require('./factory/MySQLFactory');
 const postgresfactory = require('./factory/postgresql-factory');
 const logger = require('./logger/logger');
 
-class Contributor{//tutaj może metoda wytwórcza
+class Contributor{
     constructor(dbtype, entity){
         if(dbtype === "mysql") {
             this.activeRecord = mysqlfactory.createActiveRecord(entity);
@@ -20,8 +20,6 @@ class Contributor{//tutaj może metoda wytwórcza
         if(this.checkDataObjectValidation(query)) {
 
             const activeRecord = this.activeRecord;
-            const parsedQuery = this.queryParser.parseIntoQuery(query);
-            const queryForCopy = this.queryParser.createQueryForCopy(query);
             let logFilename = '';
 
             if (query.hasOwnProperty("table")) {
@@ -62,9 +60,7 @@ class Contributor{//tutaj może metoda wytwórcza
     }
 
     restoreData(data){
-        console.log("Copied Query: "+JSON.stringify(this.copyOfResultQuery));
         const queryRestore = this.queryParser.createQueryForRestore(this.copyOfResultQuery, data);
-        console.log(queryRestore);
         this.activeRecord.restore(queryRestore);
     }
 

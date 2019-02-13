@@ -11,6 +11,26 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
+const entityBase1 = {
+    values : {
+        id_klienta: "",
+        imie: "",
+        nazwisko: "",
+        kwota: 0
+    },
+    idcolumn : "id_klienta"
+};
+
+const entityBase3 = {
+    values : {
+        id_klienta: "",
+        imie: "",
+        nazwisko: "",
+        srodki: ""
+    },
+    idcolumn : "id_klienta"
+};
+
 //coordinator.addDatabase
 monitor.addDatabase("base1", {
         connectionLimit : 10,
@@ -20,15 +40,7 @@ monitor.addDatabase("base1", {
         database: 'testowabaza',
         port: 3306
 
-    }, 'mysql', {
-    values : {
-        id_klienta: "",
-        imie: "",
-        nazwisko: "",
-        kwota: 0
-    },
-    idcolumn : "id_klienta"
-});
+    }, 'mysql', entityBase1);
 
 monitor.addDatabase("base2", {
     connectionLimit : 10,
@@ -68,123 +80,116 @@ monitor.addDatabase("base3", {
 });
 
 
-/*monitor.addDatabase("base2", {
-        connectionLimit : 10,
-        host: 'localhost',
-        user: 'root',
-        password: '',
-        database: 'ksiazki' //po prostu to jest chyba domyślny schemat
 
-    });*/
 
-const parser = require("./factory/queryparser-mysql");
-const objInsert = {
-    operation : "insert",
-    table : "bank1.klienci",
-    values : {
-        id_klienta : "DEFAULT",
-        imie : "Kuba",
-        nazwisko : "Kuba",
-        kwota : 230
-    },
-    idcolumn : "id_klienta"
+let transactionObj  = {
+    base1:[],
+    base2:[],
+    base3:[]
 };
 
-const objUpdateP = {
-    operation : "update",
-    table : "klienci",
-    values : {
-        id_klienta : "1",
-        imie : "Kuba",
-        nazwisko : "Kuba",
-        srodki : 230
-    },
-    idcolumn : "id_klienta"
-};
-
-const objInsertP = {
-    operation : "insert",
-    table : "klienci",
-    values : {
-        id_klienta : "DEFAULT",
-        imie : "Kuba",
-        nazwisko : "Łukawiec",
-        srodki : 2300
-    },
-    idcolumn : "id_klienta"
-};
-
-const objDeleteP = {
-    operation : "delete",
-    table : "klienci",
-    values : {
-        id_klienta : "10",
-        imie : "Kuba",
-        nazwisko : "Kuba",
-        srodki : 230
-    },
-    idcolumn : "id_klienta"
-};
-
-const objInsert3 = {
-    operation : "insert",
-    table : "coffeeland.complaints",
-    values : {
-        orderId : 3,
-        workerId : 0,
-        description : "Opis",
-        openDate : "2018-10-23",
-        isClosed : "false"
-    },
-    idcolumn : "orderId"
-};
-
-const objUpdate = {
-    operation : "update",
-    table : "bank1.klienci",
-    values : {
-        id_klienta : "5",
-        imie : "Michał",
-        nazwisko : "Anioł",
-        kwota : 350
-    },
-    idcolumn : "id_klienta"
-};
-
-const objDelete = {
-    operation : "delete",
-    table : "bank1.klienci",
-    values : {
-        id_klienta : "47",
-        imie : "Kuba",
-        nazwisko : "Kuba",
-        kwota : 230
-    },
-    idcolumn : "id_klienta"
-};
+let result = "";
 
 app.get('/', function(req, res) {
-    //coordinator.executeTransaction({base1: objInsert}, Date.now());
-    /*function addToDB(n){
-        if(n === 1)
-            console.log("1");
-        else if (n === 2)
-            console.log("2");
-        else if(n === 3)
-            console.log("3");
-        else
-            console.log("Problem");
-    }*/
-    //db.connect().then(obj => {console.log("Połączono");obj.done()}).catch(err => {console.log('ERROR: ', err.message)});
-    //db.one("INSERT INTO klienci VALUES(DEFAULT, 'Calvin', 'Harris', 23000) RETURNING id_klienta").then((res) => console.log(res)); //one do pojednynczego pytania - wyrzuca error, jak jest więcej niż jedno..
-    //res.render('index', {title: "Transaction Monitor Client"});
-    monitor.executeTransaction({base3: {objInsertP,objDeleteP}, base2: {objInsert3}}).then(() => {console.log("Success")}, () => {console.log("Fail")});
-    //console.log(parser.parseIntoDeleteQuery(objDelete));
+    res.render('index', {title: "Transaction Monitor Client"});
     res.end();
 });
+app.get('/base1', function (req, res) {
+    res.render('baseform1', {title: "Base 1"});
+});
+
+app.post('/base1', function(req, res){
+   res.redirect('/base1');
+});
+
+app.get('/base3', function (req, res) {
+    res.render('baseform3', {title: "Base 3"});
+});
+
+app.post('/base3', function(req, res){
+    res.redirect('/base3');
+});
+
 app.post('/execute', function (req, res) {
-    //console.log(JSON.stringify(req.body));//działa
-    monitor.executeTransaction({base1: objInsert, base2: objInsert3}).then(() => {console.log("Success")}, () => {console.log("Fail")});
+    monitor.executeTransaction(transactionObj).then(() => {result = "Success"; console.log("Success")}, () => {result = "Fail"; console.log(result);});
+    res.redirect('/execute');
+});
+
+app.get('/execute', function (req, res) {
+   res.end(result);
+});
+
+app.post('/', function (req, res) {
+    if(req.body.hasOwnProperty("insert1")){
+        const id = (req.body.id_klienta !== "") ? req.body.id_klienta : "DEFAULT";
+        transactionObj.base1.push({
+            operation : "insert",
+            table : "bank1.klienci",
+            values : {
+                id_klienta : id,
+                imie : req.body.imie,
+                nazwisko : req.body.nazwisko,
+                kwota : req.body.kwota
+            },
+            idcolumn : entityBase1["idcolumn"]});
+    } else if(req.body.hasOwnProperty("update1")){
+        transactionObj.base1.push({
+            operation : "update",
+            table : "bank1.klienci",
+            values : {
+                id_klienta : req.body.id_klienta,
+                imie : req.body.imie,
+                nazwisko : req.body.nazwisko,
+                kwota : req.body.kwota
+            },
+            idcolumn : entityBase1["idcolumn"]})
+    } else if(req.body.hasOwnProperty("delete1")){
+        transactionObj.base1.push({
+            operation : "delete",
+            table : "bank1.klienci",
+            values : {
+                id_klienta : req.body.id_klienta,
+                imie : req.body.imie,
+                nazwisko : req.body.nazwisko,
+                kwota : req.body.kwota
+            },
+            idcolumn : entityBase1["idcolumn"]})
+    } else if(req.body.hasOwnProperty("insert3")){
+        const id = (req.body.id_klienta !== "") ? req.body.id_klienta : "DEFAULT";
+        transactionObj.base3.push({
+            operation : "insert",
+            table : "klienci",
+            values : {
+                id_klienta : id,
+                imie : req.body.imie,
+                nazwisko : req.body.nazwisko,
+                srodki : req.body.srodki
+            },
+            idcolumn : entityBase3["idcolumn"]})
+    } else if(req.body.hasOwnProperty("update3")){
+        transactionObj.base3.push({
+            operation : "update",
+            table : "klienci",
+            values : {
+                id_klienta : req.body.id_klienta,
+                imie : req.body.imie,
+                nazwisko : req.body.nazwisko,
+                srodki : req.body.srodki
+            },
+            idcolumn : entityBase3["idcolumn"]})
+    } else if(req.body.hasOwnProperty("delete3")){
+        transactionObj.base3.push({
+            operation : "delete",
+            table : "klienci",
+            values : {
+                id_klienta : req.body.id_klienta,
+                imie : req.body.imie,
+                nazwisko : req.body.nazwisko,
+                srodki : req.body.srodki
+            },
+            idcolumn : entityBase3["idcolumn"]})
+    }
+    res.redirect("/");
     res.end();
 });
 app.listen(8080);

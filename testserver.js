@@ -49,6 +49,25 @@ monitor.addDatabase("base2", {
     idcolumn: "orderId"
 });
 
+monitor.addDatabase("base3", {
+    max : 10,
+    host: 'localhost',
+    user: 'postgres',
+    password: '$Epultura33',
+    database: 'bank2',
+    port: 5432
+
+}, 'postgres', {
+    values: {
+        id_klienta: "",
+        imie: "",
+        nazwisko: "",
+        srodki: ""
+    },
+    idcolumn: "id_klienta"
+});
+
+
 /*monitor.addDatabase("base2", {
         connectionLimit : 10,
         host: 'localhost',
@@ -67,6 +86,42 @@ const objInsert = {
         imie : "Kuba",
         nazwisko : "Kuba",
         kwota : 230
+    },
+    idcolumn : "id_klienta"
+};
+
+const objUpdateP = {
+    operation : "update",
+    table : "klienci",
+    values : {
+        id_klienta : "1",
+        imie : "Kuba",
+        nazwisko : "Kuba",
+        srodki : 230
+    },
+    idcolumn : "id_klienta"
+};
+
+const objInsertP = {
+    operation : "insert",
+    table : "klienci",
+    values : {
+        id_klienta : "DEFAULT",
+        imie : "Kuba",
+        nazwisko : "Łukawiec",
+        srodki : 2300
+    },
+    idcolumn : "id_klienta"
+};
+
+const objDeleteP = {
+    operation : "delete",
+    table : "klienci",
+    values : {
+        id_klienta : "10",
+        imie : "Kuba",
+        nazwisko : "Kuba",
+        srodki : 230
     },
     idcolumn : "id_klienta"
 };
@@ -100,15 +155,13 @@ const objDelete = {
     operation : "delete",
     table : "bank1.klienci",
     values : {
-        id_klienta : "5",
-        imie : "Michał",
-        nazwisko : "Anioł",
-        kwota : 350
+        id_klienta : "47",
+        imie : "Kuba",
+        nazwisko : "Kuba",
+        kwota : 230
     },
     idcolumn : "id_klienta"
 };
-
-
 
 app.get('/', function(req, res) {
     //coordinator.executeTransaction({base1: objInsert}, Date.now());
@@ -122,9 +175,11 @@ app.get('/', function(req, res) {
         else
             console.log("Problem");
     }*/
+    //db.connect().then(obj => {console.log("Połączono");obj.done()}).catch(err => {console.log('ERROR: ', err.message)});
+    //db.one("INSERT INTO klienci VALUES(DEFAULT, 'Calvin', 'Harris', 23000) RETURNING id_klienta").then((res) => console.log(res)); //one do pojednynczego pytania - wyrzuca error, jak jest więcej niż jedno..
     //res.render('index', {title: "Transaction Monitor Client"});
-    //monitor.executeTransaction({base1: objInsert, base2: objInsert3}).then(() => {console.log("Success")}, () => {console.log("Fail")});
-    console.log(parser.parseIntoDeleteQuery(objDelete));
+    monitor.executeTransaction({base3: {objInsertP,objDeleteP}, base2: {objInsert3}}).then(() => {console.log("Success")}, () => {console.log("Fail")});
+    //console.log(parser.parseIntoDeleteQuery(objDelete));
     res.end();
 });
 app.post('/execute', function (req, res) {

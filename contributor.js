@@ -1,4 +1,5 @@
 const mysqlfactory = require('./factory/MySQLFactory');
+const postgresfactory = require('./factory/postgresql-factory');
 const logger = require('./logger/logger');
 
 class Contributor{//tutaj może metoda wytwórcza
@@ -7,7 +8,7 @@ class Contributor{//tutaj może metoda wytwórcza
             this.activeRecord = mysqlfactory.createActiveRecord(entity);
             this.queryParser = mysqlfactory.createQueryParser();
         } else if (dbtype === "postgres") {
-            this.activeRecord = postgresfactory.createGateway(entity);
+            this.activeRecord = postgresfactory.createActiveRecord(entity);
             this.queryParser = postgresfactory.createQueryParser();
         }
 
@@ -38,11 +39,15 @@ class Contributor{//tutaj może metoda wytwórcza
                         this.copyOfResultQuery = this.activeRecord.copyOfResult;
                         throw err
                     });
+                else if(query["operation"] === "delete")
+                    await activeRecord.delete(query).then(() => {this.copyOfResultQuery = this.activeRecord.copyOfResult},(err) => {
+                        this.copyOfResultQuery = this.activeRecord.copyOfResult;
+                        throw err
+                    });
         }
     }
 
     async record(transactionId, data, isAccepted){
-        console.log("Dane do rekordu "+JSON.stringify(data));
         if(isAccepted)
             this.logger.recordSuccess(transactionId, this.activeRecord.copyOfResult, data);
         else
@@ -58,7 +63,7 @@ class Contributor{//tutaj może metoda wytwórcza
 
     restoreData(data){
         console.log("Copied Query: "+JSON.stringify(this.copyOfResultQuery));
-        const queryRestore = this.queryParser.createQueryForRestore(this.copyOfResultQuery, data);//było this.copyOfResultQuery[0]
+        const queryRestore = this.queryParser.createQueryForRestore(this.copyOfResultQuery, data);
         console.log(queryRestore);
         this.activeRecord.restore(queryRestore);
     }

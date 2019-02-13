@@ -1,4 +1,4 @@
-class QueryParserMySQL {
+class QueryParserPostgreSQL {
     constructor() {
         this.syntax = {
             insertBegin : "INSERT INTO ",
@@ -26,7 +26,13 @@ class QueryParserMySQL {
                 queryString = this.syntax.insertBegin + query["table"] + this.syntax.insertVal;
 
                 for(let key in query["values"])
-                    queryString += query["values"][key] + "','";
+                    if(key !== query["idcolumn"])
+                        queryString += query["values"][key] + "','";
+                    else
+                    {
+                        queryString = queryString.slice(0, queryString.length - 1);
+                        queryString += query["values"][key] + ",'";
+                    }
 
                 queryString = queryString.slice(0, queryString.length - 2);
                 queryString += ");";
@@ -53,11 +59,17 @@ class QueryParserMySQL {
         let queryString = "";
         queryString = this.syntax.insertBegin + queryObj["table"] + this.syntax.insertVal;
 
-        for(let key in query["values"])
-            queryString += queryObj["values"][key] + "','";
+        for(let key in queryObj["values"])
+            if(key !== queryObj["idcolumn"])
+                queryString += queryObj["values"][key] + "','";
+            else
+            {
+                queryString = queryString.slice(0, queryString.length - 1);
+                queryString += queryObj["values"][key] + ",'";
+            }
 
         queryString = queryString.slice(0, queryString.length - 2);
-        queryString += ");";
+        queryString += (") RETURNING " + queryObj["idcolumn"] + ";");
 
         return queryString;
     }
@@ -114,13 +126,13 @@ class QueryParserMySQL {
 
                 return restoreQuery;
 
-            } else if (data["operation"] === "insert" && copy["insertId"]){
-                return "DELETE FROM "+ data["table"] + " WHERE "+data["idcolumn"]+"="+copy["insertId"]+";"; //taka jest informacja po zwróceniu informacji z INSERT
+            } else if (data["operation"] === "insert"){
+                return "DELETE FROM "+ data["table"] + " WHERE "+data["idcolumn"]+"="+copy[data["idcolumn"]]+";";
 
             } else if (data["operation"] === "delete") {
                 let restoreQuery = "INSERT INTO "+data["table"]+" VALUES('";
                 for(let key in copy[0])
-                        restoreQuery += (copy[0][key]+"','");
+                    restoreQuery += (copy[0][key]+"','");
 
                 restoreQuery = restoreQuery.slice(0, restoreQuery.length-2) + ");";
 
@@ -135,4 +147,4 @@ class QueryParserMySQL {
 
 }
 
-module.exports = new QueryParserMySQL();
+module.exports = new QueryParserPostgreSQL();

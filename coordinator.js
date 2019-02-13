@@ -18,8 +18,14 @@ class Coordinator {
 
         for (let key in data) {
             if (data.hasOwnProperty(key)) {
-                await handl[key].execute(data[key], transactionId)
-                    .catch((err) => {console.log("Coordinator");throw err});
+                for(let queryObj in data[key]) {
+                    if(data[key].hasOwnProperty(queryObj))
+                        await handl[key].execute(data[key][queryObj], transactionId)
+                            .catch((err) => {
+                                console.log("Coordinator");
+                                throw err
+                            });
+                }
             }
         }
     }
@@ -29,7 +35,9 @@ class Coordinator {
 
         for (let key in data) {
             if (data.hasOwnProperty(key)) {
-                await handl[key].record(transactionId, data[key],true)
+                for(let queryObj in data[key])
+                    if(data[key].hasOwnProperty(queryObj))
+                await handl[key].record(transactionId, data[key][queryObj], true)
                     .catch((err) => {console.log("Coordinator");throw err});
             }
         }
@@ -40,8 +48,11 @@ class Coordinator {
 
         for (let key in data) {
             if (data.hasOwnProperty(key)) {
-                 handl[key].record(transactionId, data[key], false)
-                    .then(() => {console.log(key + " : RESTORING");handl[key].restoreData(data[key])}).catch((err) => {console.log("No restoring in unavailable database "+ err)});
+                for(let queryObj in data[key])
+                    if(data[key].hasOwnProperty(queryObj))
+                         handl[key].record(transactionId, data[key][queryObj], false)
+                            .then(() => {console.log(key + " : RESTORING");handl[key].restoreData(data[key])})
+                             .catch((err) => {console.log("No restoring in unavailable database "+ err)});
             }
         }
     }

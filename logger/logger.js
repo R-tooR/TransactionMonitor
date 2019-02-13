@@ -15,16 +15,22 @@ class Logger{
         } else if (dataCurr.hasOwnProperty("operation") && dataCurr["operation"] === "update"){
             fs.appendFileSync(this.path, transactionId+"|update|"+JSON.stringify(dataCurr["values"])+"|"
                 +JSON.stringify(dataPrev)+"|true\n");
+        } else if (dataCurr.hasOwnProperty("operation") && dataCurr["operation"] === "delete"){
+            fs.appendFileSync(this.path, transactionId+"|delete|"+JSON.stringify(dataCurr["values"])+"|"
+                +JSON.stringify(dataPrev)+"|true\n");
         }
     }
 
     recordFail(transactionId, dataPrev, dataCurr){
         if(dataCurr.hasOwnProperty("operation") && dataCurr["operation"] === "insert"){
             fs.appendFileSync(this.path, transactionId+"|insert|"+JSON.stringify(dataCurr["values"])+"|false\n");
-        } else{
+        } else if (dataCurr.hasOwnProperty("operation") && dataCurr["operation"] === "update"){
             fs.appendFileSync(this.path, transactionId+"|update|"+JSON.stringify(dataCurr["values"])+"|"
+            +JSON.stringify(dataPrev)+"|false\n");
+        } else if (dataCurr.hasOwnProperty("operation") && dataCurr["operation"] === "delete"){
+            fs.appendFileSync(this.path, transactionId+"|delete|"+JSON.stringify(dataCurr["values"])+"|"
                 +JSON.stringify(dataPrev)+"|false\n");
-        }
+}
     }
 
 }

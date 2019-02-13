@@ -1,7 +1,7 @@
 function ActiveRecord(){
 
     this.dataForDBPoolAreValid = obj => {
-        if (obj !== undefined && obj["connectionLimit"] !== undefined && obj["user"] !== undefined && obj["password"] !== undefined
+        if (obj !== undefined && (obj["connectionLimit"] !== undefined || obj["max"] !== undefined)&& obj["user"] !== undefined && obj["password"] !== undefined
             && obj["host"] !== undefined && obj["database"] !== undefined)
             return true;
         else

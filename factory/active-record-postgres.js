@@ -1,12 +1,12 @@
-const mysql = require('promise-mysql');
+const postgresql = require('pg-promise')();
 const ActiveRecord = require('./active-record');
-const queryparser = require('./queryparser-mysql');
+const queryparser = require('./queryparser-postgres');
 
-class ActiveRecordMysql extends ActiveRecord {
+class ActiveRecordPostgresql extends ActiveRecord {
     constructor(entity) {
         super();
         this.connectionPool = {};
-        console.log('Created MySQL ActiveRecord');
+        console.log('Created PostgreSQL ActiveRecord');
         this.copyOfResult = {};
         this.queryParser = queryparser;
         this.entity = entity;
@@ -17,25 +17,25 @@ class ActiveRecordMysql extends ActiveRecord {
      * @param connection Connection data to database
      */
     setConnection(connection) {
+        console.log(JSON.stringify(connection));
         if (this.dataForDBPoolAreValid(connection)) {
-            this.connectionPool = mysql.createPool(connection);
+            this.connectionPool = postgresql(connection);
         } else throw "Object or at least one of its fields: 'user', 'password', 'host', 'database' is undefined";
     }
 
     async update(queryObj){
         try{
             if(this.areColumnsConsistent(queryObj)) {
-                const conn = await this.connectionPool.getConnection();
+                const conn = await this.connectionPool.connect();
                 const query = this.queryParser.parseIntoUpdateQuery(queryObj);
                 const copy = this.queryParser.createQueryForCopy(queryObj);
                 try {
-
-                    this.copyOfResult = await conn.query(copy);
-                    const result = await conn.query(query);
+                    this.copyOfResult = await conn.one(copy);
+                    const result = await conn.none(query);
                     console.log(result);
 
                 } finally {
-                    this.connectionPool.releaseConnection(conn);
+                    conn.done();
                 }
             }
         }catch(err){
@@ -46,17 +46,16 @@ class ActiveRecordMysql extends ActiveRecord {
     async insert(queryObj){
         try{
             if(this.areColumnsConsistent(queryObj)) {
-                const conn = await this.connectionPool.getConnection();
+                const conn = await this.connectionPool.connect();
                 const query = this.queryParser.parseIntoInsertQuery(queryObj);
 
                 try {
 
-                    this.copyOfResult = await conn.query(query);
-                    const result = await conn.query(query);
-                    console.log(result);
+                    this.copyOfResult = await conn.one(query);
+                    console.log(this.copyOfResult);
 
                 } finally {
-                    this.connectionPool.releaseConnection(conn);
+                    conn.done();
                 }
             }
         }catch(err){
@@ -67,17 +66,17 @@ class ActiveRecordMysql extends ActiveRecord {
     async delete(queryObj){
         try{
             if(this.areColumnsConsistent(queryObj)) {
-                const conn = await this.connectionPool.getConnection();
+                const conn = await this.connectionPool.connect();
                 const query = this.queryParser.parseIntoDeleteQuery(queryObj);
                 const copy = this.queryParser.createQueryForCopy(queryObj);
                 try {
 
-                    this.copyOfResult = await conn.query(copy);
-                    const result = await conn.query(query);
-                    console.log(result);
+                    this.copyOfResult = await conn.one(copy);
+                    const result = await conn.none(query);
+                    console.log(this.copyOfResult);
 
                 } finally {
-                    this.connectionPool.releaseConnection(conn);
+                    conn.done();
                 }
             }
         }catch(err){
@@ -88,14 +87,14 @@ class ActiveRecordMysql extends ActiveRecord {
     async find(queryObj) {
 
         try {
-            const conn = await this.connectionPool.getConnection();
+            const conn = await this.connectionPool.connect();
             const query = this.queryParser.createQueryForCopy(queryObj);
 
             try {
                 const result = await conn.query(query);
                 console.log(this.copyOfResult);
             } finally {
-                this.connectionPool.releaseConnection(conn);
+                conn.done();
             }
         } catch (err) {
             throw err;
@@ -104,14 +103,14 @@ class ActiveRecordMysql extends ActiveRecord {
 
     async findAll(queryObj){
         try {
-            const conn = await this.connectionPool.getConnection();
+            const conn = await this.connectionPool.connect();
             const query = this.queryParser.createQueryForFindAll(queryObj);
 
             try {
                 const result = await conn.query(query);
                 console.log(this.copyOfResult);
             } finally {
-                this.connectionPool.releaseConnection(conn);
+                conn.done();
             }
         } catch (err) {
             throw err;
@@ -120,15 +119,15 @@ class ActiveRecordMysql extends ActiveRecord {
 
     restore(copy){
         let connection = {};
-        this.connectionPool.getConnection().then((conn) => {connection = conn; return connection.query(copy)})
+        this.connectionPool.connect().then((conn) => {connection = conn; return connection.any(copy)})
             .catch((err) => {console.log("No need to restore because of lack of changes in this database " + err)})
-            .then(() => {this.connectionPool.releaseConnection(connection)}).catch((err) => {console.log("Unreleased non-existing connection");});
+            .then(() => {connection.done();});
     }
 
 }
 
 module.exports = function(entity){
-    return new ActiveRecordMysql(entity);
+    return new ActiveRecordPostgresql(entity);
 };
 
 

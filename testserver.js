@@ -3,7 +3,7 @@ var logger = require('./logger/logger');
 var express = require('express');
 var app = express();
 app.set('view engine', 'pug');
-const monitor = require('./monitor');
+const monitor = require('./executors/monitor');
 const bodyParser = require("body-parser");
 
 app.use(bodyParser.urlencoded({
@@ -111,12 +111,20 @@ app.post('/base3', function(req, res){
 });
 
 app.post('/execute', function (req, res) {
-    monitor.executeTransaction(transactionObj).then(() => {result = "Success"; console.log("Success")}, () => {result = "Fail"; console.log(result);});
-    res.redirect('/execute');
+    monitor.executeTransaction(transactionObj).then(() => {result=true; console.log("Success")}, () => {result = false; console.log("Fail");});
+
 });
 
 app.get('/execute', function (req, res) {
    res.end(result);
+});
+
+app.get('/success',function (req, res) {
+    res.end("Transaction succeed. Changes has been applied.");
+});
+
+app.get('/fail',function (req, res) {
+    res.end("Transaction failed. Changes has been discard.");
 });
 
 app.post('/', function (req, res) {
@@ -189,6 +197,7 @@ app.post('/', function (req, res) {
             },
             idcolumn : entityBase3["idcolumn"]})
     }
+    console.log(JSON.stringify(transactionObj));
     res.redirect("/");
     res.end();
 });

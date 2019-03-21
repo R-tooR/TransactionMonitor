@@ -1,7 +1,7 @@
 const mysql = require('./active-record-mysql');
-const mysqlParser = require('./queryparser-mysql');
+const mysqlParser = require('../queryparsers/queryparser-mysql');
 
-function MySQLFactory(){
+function MysqlFactory(){
     this.createActiveRecord = function(entity){
         return mysql(entity);
     };
@@ -11,4 +11,4 @@ function MySQLFactory(){
     };
 }
 
-module.exports = new MySQLFactory();
+module.exports = new MysqlFactory();

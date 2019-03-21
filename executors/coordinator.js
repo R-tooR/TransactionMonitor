@@ -1,4 +1,4 @@
-const Contributor = require('./Contributor');
+const Contributor = require('./contributor');
 
 class Coordinator {
     constructor() {

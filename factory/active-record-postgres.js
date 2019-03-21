@@ -1,6 +1,6 @@
 const postgresql = require('pg-promise')();
 const ActiveRecord = require('./active-record');
-const queryparser = require('./queryparser-postgres');
+const queryparser = require('../queryparsers/queryparser-postgres');
 
 class ActiveRecordPostgresql extends ActiveRecord {
     constructor(entity) {

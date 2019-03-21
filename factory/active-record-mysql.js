@@ -1,6 +1,6 @@
 const mysql = require('promise-mysql');
 const ActiveRecord = require('./active-record');
-const queryparser = require('./queryparser-mysql');
+const queryparser = require('../queryparsers/queryparser-mysql');
 
 class ActiveRecordMysql extends ActiveRecord {
     constructor(entity) {
@@ -50,10 +50,8 @@ class ActiveRecordMysql extends ActiveRecord {
                 const query = this.queryParser.parseIntoInsertQuery(queryObj);
 
                 try {
-
                     this.copyOfResult = await conn.query(query);
-                    const result = await conn.query(query);
-                    console.log(result);
+                    console.log(this.copyOfResult);
                 } finally {
                     this.connectionPool.releaseConnection(conn);
                 }

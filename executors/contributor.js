@@ -1,6 +1,6 @@
-const mysqlfactory = require('./factory/MySQLFactory');
-const postgresfactory = require('./factory/postgresql-factory');
-const logger = require('./logger/logger');
+const mysqlfactory = require('../factory/mysql-factory');
+const postgresfactory = require('../factory/postgresql-factory');
+const logger = require('../logger/logger');
 
 class Contributor{
     constructor(dbtype, entity){
@@ -10,7 +10,7 @@ class Contributor{
         } else if (dbtype === "postgres") {
             this.activeRecord = postgresfactory.createActiveRecord(entity);
             this.queryParser = postgresfactory.createQueryParser();
-        }
+        } else throw "Type must be one of: 'mysql' or 'postgres'!";
 
         this.logger = logger();
         this.copyOfResultQuery = '';

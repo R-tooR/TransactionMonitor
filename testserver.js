@@ -34,7 +34,7 @@ monitor.addDatabase("base2", {
     connectionLimit : 10,
     host: 'localhost',
     user: 'root',
-    password: '$Epultura33',
+    password: '',
     database: 'coffeeland',
     port: 3307
 
